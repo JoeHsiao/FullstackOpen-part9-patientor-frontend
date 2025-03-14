@@ -1,7 +1,8 @@
 import { Button, Grid, TextField, Typography } from "@mui/material";
-import React, { SyntheticEvent, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import patientService from "../../services/patients";
 import { Entry, EntryWithoutId } from "../../types";
+import axios from "axios";
 
 const EntryForm: React.FC<{
   id: string;
@@ -9,6 +10,11 @@ const EntryForm: React.FC<{
 }> = ({ id, updateEntries }) => {
   const [code, setCode] = useState("");
   const [codeList, setCodeList] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  useEffect(() => {
+    setErrorMessage("");
+  }, [id]);
 
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
@@ -31,8 +37,14 @@ const EntryForm: React.FC<{
     try {
       const addedEntry = await patientService.addEntry(id, entry);
       updateEntries(addedEntry);
-    } catch (error) {
-      console.log(error);
+      setErrorMessage("");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setErrorMessage(err.response?.data.error.join("; "));
+      } else {
+        setErrorMessage("Error occurred");
+      }
+      console.log(err);
     }
   };
 
@@ -45,6 +57,9 @@ const EntryForm: React.FC<{
       >
         <Grid item xs={12}>
           <Typography variant="h6">HealthCheck Form</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography color="red">{errorMessage}</Typography>
         </Grid>
         <Grid item xs={6} sx={{ padding: 1 }}>
           <TextField name="date" label="date" variant="outlined" size="small" />
