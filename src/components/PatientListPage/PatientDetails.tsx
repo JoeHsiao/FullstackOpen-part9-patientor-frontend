@@ -36,8 +36,8 @@ const PatientDetails = () => {
       <div>ssn: {patient.ssn}</div>
       <div>occupation: {patient.occupation}</div>
       <div style={{ padding: "5px" }}>
-        {patient.entries.map((e, i) => (
-          <EntryDetails key={i} entry={e} />
+        {patient.entries.map((e) => (
+          <EntryDetails key={e.id} entry={e} />
         ))}
       </div>
     </div>
