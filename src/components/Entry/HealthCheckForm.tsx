@@ -1,12 +1,25 @@
-import { Button, Grid, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { SyntheticEvent, useState } from "react";
 import { EntryWithoutId } from "../../types";
+import MultipleSelectCheckmarks from "../Utils/MultipleSelectionCheckmarks";
+import { useContext } from "react";
+import DiagnosesContext from "../../context/Diagnoses";
 
 const HealthCheckForm: React.FC<{
   handleSubmit: (event: SyntheticEvent, entry: EntryWithoutId) => Promise<void>;
 }> = ({ handleSubmit }) => {
-  const [code, setCode] = useState("");
   const [codeList, setCodeList] = useState<string[]>([]);
+  const diagnosesContext = useContext(DiagnosesContext);
+  const codeNames = diagnosesContext.map((d) => d.code);
 
   const onSubmit = (e: SyntheticEvent) => {
     const target = e.target as typeof e.target & {
@@ -40,7 +53,14 @@ const HealthCheckForm: React.FC<{
         </Grid>
 
         <Grid item xs={6} sx={{ padding: 1 }}>
-          <TextField name="date" label="date" variant="outlined" size="small" />
+          <TextField
+            name="date"
+            label="date"
+            type="date"
+            variant="outlined"
+            size="small"
+            InputLabelProps={{ shrink: true }}
+          />
         </Grid>
         <Grid item xs={6} sx={{ padding: 1 }}>
           <TextField
@@ -59,32 +79,27 @@ const HealthCheckForm: React.FC<{
           />
         </Grid>
         <Grid item xs={6} sx={{ padding: 1 }}>
-          <TextField
-            name="healthCheckRating"
-            label="healthCheckRating"
-            variant="outlined"
-            size="small"
-          />
+          <FormControl fullWidth>
+            <InputLabel id="simple-select-label">Health rating</InputLabel>
+            <Select
+              labelId="simple-select-label"
+              id="simple-select"
+              label="Health rating"
+              inputProps={{ name: "healthCheckRating" }}
+              defaultValue={0}
+            >
+              <MenuItem value={0}>Healthy</MenuItem>
+              <MenuItem value={1}>Low risk</MenuItem>
+              <MenuItem value={2}>High risk</MenuItem>
+              <MenuItem value={3}>Critical risk</MenuItem>
+            </Select>
+          </FormControl>
         </Grid>
-        <Grid item xs={6} sx={{ padding: 1 }}>
-          <TextField
-            label="diagnosis code"
-            variant="outlined"
-            size="small"
-            value={code}
-            fullWidth
-            onChange={(event) => setCode(event.target.value)}
+        <Grid item xs={12} sx={{ padding: 1 }}>
+          <MultipleSelectCheckmarks
+            items={codeNames}
+            setSelection={setCodeList}
           />
-        </Grid>
-
-        <Grid item xs={4} sx={{ padding: 1 }}>
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => setCodeList(codeList.concat(code))}
-          >
-            add code
-          </Button>
         </Grid>
         <Grid item xs={12} sx={{ padding: 1 }}>
           <Typography>codes: {codeList.join(", ")}</Typography>

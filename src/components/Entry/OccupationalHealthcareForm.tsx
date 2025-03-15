@@ -1,12 +1,15 @@
 import { Button, Grid, TextField, Typography } from "@mui/material";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useContext, useState } from "react";
 import { EntryWithoutId } from "../../types";
+import DiagnosesContext from "../../context/Diagnoses";
+import MultipleSelectCheckmarks from "../Utils/MultipleSelectionCheckmarks";
 
 const OccupationalHealthcareForm: React.FC<{
   handleSubmit: (event: SyntheticEvent, entry: EntryWithoutId) => Promise<void>;
 }> = ({ handleSubmit }) => {
-  const [code, setCode] = useState("");
   const [codeList, setCodeList] = useState<string[]>([]);
+  const diagnosesContext = useContext(DiagnosesContext);
+  const codeNames = diagnosesContext.map((d) => d.code);
 
   const onSubmit = (e: SyntheticEvent) => {
     const target = e.target as typeof e.target & {
@@ -46,7 +49,14 @@ const OccupationalHealthcareForm: React.FC<{
         </Grid>
 
         <Grid item xs={6} sx={{ padding: 1 }}>
-          <TextField name="date" label="date" variant="outlined" size="small" />
+          <TextField
+            name="date"
+            label="date"
+            type="date"
+            variant="outlined"
+            size="small"
+            InputLabelProps={{ shrink: true }}
+          />
         </Grid>
         <Grid item xs={6} sx={{ padding: 1 }}>
           <TextField
@@ -72,44 +82,34 @@ const OccupationalHealthcareForm: React.FC<{
             size="small"
           />
         </Grid>
-        <Grid item xs={3} sx={{ padding: 1 }}>
+        <Grid item xs={2} sx={{ padding: 1 }}>
           <Typography>Sick leave</Typography>
         </Grid>
-        <Grid item xs={4} sx={{ padding: 1 }}>
+        <Grid item xs={5} sx={{ padding: 1 }}>
           <TextField
             name="startDate"
             label="Start date"
+            type="date"
             variant="outlined"
             size="small"
+            InputLabelProps={{ shrink: true }}
           />
         </Grid>
-        <Grid item xs={4} sx={{ padding: 1 }}>
+        <Grid item xs={5} sx={{ padding: 1 }}>
           <TextField
             name="endDate"
             label="End date"
+            type="date"
             variant="outlined"
             size="small"
+            InputLabelProps={{ shrink: true }}
           />
         </Grid>
-        <Grid item xs={6} sx={{ padding: 1 }}>
-          <TextField
-            label="diagnosis code"
-            variant="outlined"
-            size="small"
-            value={code}
-            fullWidth
-            onChange={(event) => setCode(event.target.value)}
+        <Grid item xs={12} sx={{ padding: 1 }}>
+          <MultipleSelectCheckmarks
+            items={codeNames}
+            setSelection={setCodeList}
           />
-        </Grid>
-
-        <Grid item xs={4} sx={{ padding: 1 }}>
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => setCodeList(codeList.concat(code))}
-          >
-            add code
-          </Button>
         </Grid>
         <Grid item xs={12} sx={{ padding: 1 }}>
           <Typography>codes: {codeList.join(", ")}</Typography>
