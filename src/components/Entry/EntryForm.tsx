@@ -3,12 +3,17 @@ import patientService from "../../services/patients";
 import { Entry, EntryWithoutId } from "../../types";
 import axios from "axios";
 import HealthCheckForm from "./HealthCheckForm";
+import Grid from "@mui/material/Grid";
+import { InputLabel, MenuItem, Select } from "@mui/material";
+import OccupationalHealthcareForm from "./OccupationalHealthcareForm";
+import HospitalForm from "./HospitalForm";
 
 const EntryForm: React.FC<{
   id: string;
   updateEntries: (entry: Entry) => void;
 }> = ({ id, updateEntries }) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [formType, setFormType] = useState<string>("HealthCheck");
 
   useEffect(() => {
     setErrorMessage("");
@@ -31,10 +36,32 @@ const EntryForm: React.FC<{
   };
   return (
     <div>
+      <Grid item xs={12} sx={{ padding: 1 }}>
+        <InputLabel id="form-type-label">Form Type</InputLabel>
+        <Select
+          fullWidth
+          labelId="form-type-label"
+          value={formType}
+          label="Form Type"
+          onChange={(event) => setFormType(event.target.value)}
+        >
+          <MenuItem value="HealthCheck">HealthCheck</MenuItem>
+          <MenuItem value="Hospital">Hospital</MenuItem>
+          <MenuItem value="OccupationalHealthcare">
+            OccupationalHealthcare
+          </MenuItem>
+        </Select>
+      </Grid>
       <div style={{ color: "red" }}>
         <h4>{errorMessage}</h4>
       </div>
-      <HealthCheckForm handleSubmit={handleSubmit} />;
+      {formType === "HealthCheck" && (
+        <HealthCheckForm handleSubmit={handleSubmit} />
+      )}
+      {formType === "Hospital" && <HospitalForm handleSubmit={handleSubmit} />}
+      {formType === "OccupationalHealthcare" && (
+        <OccupationalHealthcareForm handleSubmit={handleSubmit} />
+      )}
     </div>
   );
 };
